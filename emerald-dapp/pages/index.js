@@ -10,6 +10,7 @@ export default function Home() {
 
   const [newGreeting, setNewGreeting] = useState('');
   const [greeting, setGreeting] = useState('');
+  const [txStatus, setTxStatus] = useState('Run Transaction');
 
   async function runTransaction() {
     const transactionId = await fcl.mutate({
@@ -35,8 +36,22 @@ export default function Home() {
     })
   
     console.log("Here is the transactionId: " + transactionId);
-    await fcl.tx(transactionId).onceSealed();
+    fcl.tx(transactionId).subscribe(res => {
+      console.log(res);
+      if (res.status === 0 || res.status === 1) {
+        setTxStatus('Pending...');
+      } else if (res.status === 2) {
+        setTxStatus('Finalized...')
+      } else if (res.status === 3) {
+        setTxStatus('Executed...');
+      } else if (res.status === 4) {
+        setTxStatus('Sealed!');
+        setTimeout(() => setTxStatus('Run Transaction'), 2000); // We added this line
+      }
+    })
     executeScript();
+
+
   }
 
   async function executeScript() {
@@ -79,7 +94,7 @@ export default function Home() {
         <p>{greeting}</p>
         <div className={styles.flex}>
           <input onChange={(e) => setNewGreeting(e.target.value)} placeholder="Hello, Idiots!" />
-          <button onClick={runTransaction}>Run Transaction</button>
+          <button onClick={runTransaction}>{txStatus}</button>
         </div>
       </main>
     </div>
