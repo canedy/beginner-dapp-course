@@ -3,3 +3,5 @@ tasks:
       echo 'TODO: build project'
     command: |
       echo 'TODO: start app'
+      sh -ci "$(curl -fsSL https://storage.googleapis.com/flow-cli/install.sh)"
+      export PATH=$PATH:/home/gitpod/.local/bin
